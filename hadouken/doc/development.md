@@ -1,7 +1,7 @@
 # Local Development
 
 ## Running the React Server
-Execute
+In the `hadouken` directory, execute
 
     npm start
 
@@ -11,7 +11,7 @@ followed by
 
 Electron will load the React app, and code changes will be reflected live.
 
-To run the production build, build the app:
+To run the production build, build the app in the `hadouken` directory:
 
     npm run build
 

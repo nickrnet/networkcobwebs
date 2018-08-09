@@ -1,4 +1,4 @@
-const {app, BrowserWindow} = require('electron');
+const { app, BrowserWindow } = require('electron');
 const path = require('path');
 const url = require('url');
 
@@ -10,7 +10,9 @@ const startUrl = process.env.ELECTRON_START_URL || url.format({
 let mainWindow;
 
 function createWindow () {
-    mainWindow = new BrowserWindow({width: 800, height: 600, frame: false});
+    mainWindow = new BrowserWindow({ width: 800, height: 600 });
+    // TODO: go frameless (a la Spotify/Slack), but need window drag/resize
+    // mainWindow = new BrowserWindow({width: 800, height: 600, frame: false});
     // mainWindow.loadFile('index.html');
     // mainWindow.loadFile('build/index.html');
     mainWindow.loadURL(startUrl);

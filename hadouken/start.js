@@ -1,6 +1,8 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, ipcMain, ipcRenderer, Menu } = require('electron');
 const path = require('path');
 const url = require('url');
+
+const menuItems = require('./menu');
 
 const startUrl = process.env.ELECTRON_START_URL || url.format({
     pathname: path.join(__dirname, 'build/index.html'),
@@ -10,13 +12,22 @@ const startUrl = process.env.ELECTRON_START_URL || url.format({
 let mainWindow;
 
 function createWindow () {
-    mainWindow = new BrowserWindow({ width: 800, height: 600 });
-    // TODO: go frameless (a la Spotify/Slack), but need window drag/resize
-    // mainWindow = new BrowserWindow({width: 800, height: 600, frame: false});
-    // mainWindow.loadFile('index.html');
-    // mainWindow.loadFile('build/index.html');
+    mainWindow = new BrowserWindow({ 
+        width: 800,
+        height: 600,
+        titleBarStyle: 'hidden'
+    });
+    Menu.setApplicationMenu(Menu.buildFromTemplate(menuItems()));
     mainWindow.loadURL(startUrl);
-    // mainWindow.webContents.openDevTools();
+    mainWindow.webContents.openDevTools();
+
+    ipcMain.on('openPreferencesDialog', function(message, arg) {
+        mainWindow.webContents.send('openPreferencesDialog');
+    });
+
+    ipcMain.on('closePreferencesDialog', function(message, arg) {
+        mainWindow.webContents.send('closePreferencesDialog');
+    });
 
     mainWindow.on('closed', function () {
         mainWindow = null;
@@ -26,9 +37,9 @@ app.on('ready', createWindow);
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {
-    if (process.platform !== 'darwin') {
+    // if (process.platform !== 'darwin') {
         app.quit();
-    }
+    // }
 });
 
 app.on('activate', function () {

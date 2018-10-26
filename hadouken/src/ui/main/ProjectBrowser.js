@@ -13,6 +13,7 @@ import FileIcon from '@material-ui/icons/Description';
 import FolderIcon from '@material-ui/icons/Folder';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
+const Component = React.Component;
 
 const drawerWidth = 240;
 
@@ -27,7 +28,7 @@ const styles = theme => ({
     toolbar: theme.mixins.toolbar
   });
 
-class ProjectBrowser extends React.Component {
+class ProjectBrowser extends Component {
     constructor (props) {
         super(props);
         this.state = {

@@ -1,16 +1,37 @@
 import Main from './ui/main/Main.js';
 import Preferences from './ui/preferences/Preferences.js';
-const electron = window.require('electron');
+
+let electron, ipcRenderer;
 const React = require('react');
 const Component = React.Component;
-const app = electron.app;
-const shell = electron.shell
-const ipcRenderer = electron.ipcRenderer;
 
 class App extends Component {
   constructor (props) {
     super(props);
+    // detect browser for preference storage
+    // use file for electron
+    // use session storage for browser (Chrome, FF, IE)
+    let ua = navigator.userAgent;
+    if (ua.indexOf('Electron') !== -1) {
+      electron = window.require('electron');
+      ipcRenderer = electron.ipcRenderer;
+
+      ipcRenderer.on('openAboutDialog', () => {
+        this.openAboutDialog();
+      });
+      ipcRenderer.on('openPreferencesDialog', () => {
+        this.openPreferencesDialog();
+      });
+      ipcRenderer.on('closePreferencesDialog', () => {
+        this.closePreferencesDialog();
+      });
+    } else {
+      electron = false;
+      ipcRenderer = false;
+    }
+    
     this.state = {
+      electron: electron,
       about: {
         aboutDialogOpen: false
       },
@@ -20,15 +41,6 @@ class App extends Component {
         closePreferencesDialog: this.closePreferencesDialog.bind(this)
       }
     };
-    ipcRenderer.on('openAboutDialog', () => {
-      this.openAboutDialog();
-    });
-    ipcRenderer.on('openPreferencesDialog', () => {
-      this.openPreferencesDialog();
-    });
-    ipcRenderer.on('closePreferencesDialog', () => {
-      this.closePreferencesDialog();
-    });
   }
 
   openAboutDialog () {
@@ -58,7 +70,7 @@ class App extends Component {
   render () {
     return (
       <div>
-        <Main electron = { electron } />
+        <Main electron = { electron } preferences = { this.state.preferences }/>
         <Preferences electron = { electron } preferences = { this.state.preferences } />
       </div>
     );

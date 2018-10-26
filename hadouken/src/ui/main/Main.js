@@ -6,11 +6,15 @@ import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
+import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import PlayArrow from '@material-ui/icons/PlayArrow';
+import Settings from '@material-ui/icons/SettingsApplications';
 
 import ProjectBrowser from './ProjectBrowser.js';
+
+const Component = React.Component;
 
 const styles = theme => ({
   root: {
@@ -18,25 +22,27 @@ const styles = theme => ({
     zIndex: 1,
     overflow: 'hidden',
     position: 'relative',
-    display: 'flex',
+    display: 'flex'
   },
   appBar: {
-    zIndex: theme.zIndex.drawer + 1,
+    zIndex: theme.zIndex.drawer + 1
   },
   content: {
     flexGrow: 1,
     backgroundColor: theme.palette.background.default,
     padding: theme.spacing.unit * 3,
-    minWidth: 0, // So the Typography noWrap works
+    minWidth: 0
   },
   toolbar: theme.mixins.toolbar,
-  menuButton: {
-    marginLeft: -12,
-    marginRight: 20,
+  runButton: {
+    marginLeft: 1
+  },
+  settingsButton: {
+    marginLeft: 100,
   }
 });
 
-class Main extends React.Component {
+class Main extends Component {
     constructor (props) {
         super(props);
         this.state = {
@@ -44,6 +50,8 @@ class Main extends React.Component {
                 currentlyDisplayed: 0
             }
         };
+        this.displayPreferences = this.displayPreferences.bind(this);
+        this.displayPreferencesButton = this.displayPreferencesButton.bind(this);
     }
 
     changeEditor = (event, value) => {
@@ -51,6 +59,29 @@ class Main extends React.Component {
         openDocuments.currentlyDisplayed = value;
         this.setState({ openDocuments });
     };
+
+    displayPreferences = () => {
+        this.props.preferences.openPreferencesDialog();
+    }
+
+    displayPreferencesButton = () => {
+        const { classes } = this.props;
+        if (!this.props.electron) {
+            return (
+                <IconButton
+                    className = { classes.settingsButton }
+                    color = "inherit"
+                    aria-label = "Settings..."
+                    onClick = { this.displayPreferences }>
+                    <Tooltip title = "Settings...">
+                        <Settings />
+                    </Tooltip>
+                </IconButton>
+            );
+        } else {
+            return (<div className = { classes.settingsButton }></div>);
+        }
+    }
 
     render () {
         const { classes } = this.props;
@@ -60,8 +91,11 @@ class Main extends React.Component {
             <div className = { classes.root }>
                 <AppBar position = "absolute" className = { classes.appBar }>
                     <Toolbar variant = "dense">
-                      <IconButton className = { classes.menuButton } color = "inherit" aria-label = "Run...">
-                        <PlayArrow />
+                      { this.displayPreferencesButton() }
+                      <IconButton className = { classes.runButton } color = "inherit" aria-label = "Run...">
+                        <Tooltip title = "Run...">
+                            <PlayArrow />
+                        </Tooltip>
                       </IconButton>
                     </Toolbar>
                 </AppBar>

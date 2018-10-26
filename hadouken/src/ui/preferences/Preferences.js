@@ -11,15 +11,16 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import ListSubheader from '@material-ui/core/ListSubheader';
 import Collapse from '@material-ui/core/Collapse';
+import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
-const electron = window.require('electron');
-const app = electron.remote.app;
-const shell = electron.remote.shell;
-const ipcMain = electron.remote.ipcMain;
+import FolderIcon from '@material-ui/icons/Folder';
+import ExpandLess from '@material-ui/icons/ExpandLess';
+import ExpandMore from '@material-ui/icons/ExpandMore';
 
-const drawerWidth = 240;
+const Component = React.Component;
+
+const drawerWidth = 200;
 
 const styles = theme => ({
     root: {
@@ -36,7 +37,6 @@ const styles = theme => ({
     content: {
         flexGrow: 1,
         backgroundColor: theme.palette.background.default,
-        padding: theme.spacing.unit * 3,
         minWidth: 0
     },
         menuButton: {
@@ -45,26 +45,65 @@ const styles = theme => ({
     }
 });
 
-class Preferences extends React.Component {
+class Preferences extends Component {
     constructor (props) {
         super(props);
         this.createPreferences = this.createPreferences.bind(this);
         this.savePreferences = this.savePreferences.bind(this);
+        if (props.electron) {}
+        this.state = {
+            browser: '',
+            electron: {}
+        }
     }
     createPreferences () {
-        let prefPath = app.getPath('userData');
-        console.log(prefPath);
+        let { electron, preferences } = this.props;
+        if (electron) {
+            const fs = electron.remote.require('fs-extra');
+            let app = this.props.electron.remote.app;
+            let prefPath = app.getPath('appData');
+            let defaultPython = '/Library/Frameworks/Python.framework/Versions/2.7/bin/python';
+            console.log(prefPath);
+        }
     }
     savePreferences (event) {
-        let prefPath = app.getPath('userData');
-        console.log(prefPath);
-        ipcMain.emit('closePreferencesDialog');
+        let { electron, preferences } = this.props;
+        if (electron) {
+            const fs = electron.remote.require('fs-extra');
+            let app = this.props.electron.remote.app;
+            let ipcMain = this.props.electron.remote.ipcMain;
+            let prefPath = app.getPath('appData');
+            console.log(prefPath);
+            ipcMain.emit('closePreferencesDialog');
+        } else {
+            // in a browser, not electron
+            // use browser session storage
+            preferences.closePreferencesDialog();
+        }
     }
     render () {
+        const { classes } = this.props;
         const { preferences } = this.props;
         return (
-            <Dialog open = { preferences.preferencesDialogOpen }>
+            <Dialog
+                fullScreen
+                open = { preferences.preferencesDialogOpen }>
                 <DialogContent>
+                    <Drawer
+                        variant = "permanent"
+                        classes = {{ paper: classes.drawerPaper, }}>
+                        <List
+                            component = "nav"
+                            dense = { Boolean(true) } >
+                            <ListItem button onClick = { this.handleClick }>
+                                <ListItemIcon>
+                                    <FolderIcon />
+                                </ListItemIcon>
+                                <ListItemText inset primary = "Python" />
+                                {this.state.open ? <ExpandLess /> : <ExpandMore />}
+                            </ListItem>
+                        </List>
+                    </Drawer>
                     <Typography>Preferences here.</Typography>
                 </DialogContent>
                 <DialogActions>

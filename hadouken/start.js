@@ -5,17 +5,23 @@ const url = require('url');
 const menuItems = require('./menu');
 
 const startUrl = process.env.ELECTRON_START_URL || url.format({
-    pathname: path.join(__dirname, 'build/index.html'),
+    pathname: path.join(__dirname, 'build'),
     protocol: 'file:',
     slashes: true
 });
+
+console.log('startUrl:', startUrl);
+
 let mainWindow;
 
 function createWindow () {
     mainWindow = new BrowserWindow({ 
         width: 800,
         height: 600,
-        titleBarStyle: 'hidden'
+        titleBarStyle: 'hidden',
+        webPreferences: {
+            webSecurity: false
+        }
     });
     Menu.setApplicationMenu(Menu.buildFromTemplate(menuItems()));
     mainWindow.loadURL(startUrl);
